@@ -90,6 +90,150 @@ You will need to provide detailed documentation of your API endpoints including 
 }
 ```
 
+## **Getting Started**
+Base URL: This project is not hosted currently, it can be setup locally on the default localhost port.
+`http://127.0.0.1:5000/`
+<br>
+
+<br>
+Authentication: This api requires no secret keys or authentications whatsoever
+
+### **Endpoints**
+`GET /categories`
+* Endpoint to fetch categories in the api ordered by their ids
+* Arguments: Accepts no arguments
+* Return: Returns a json object containing the success status, categories and total number of categories in the api.
+* Sample request: `curl http://127.0.0.1:5000/categories`
+
+<br>
+
+`GET /questions`
+* Endpoint to fetch all questions in the api ordered by their ids
+* Arguments: Accepts no argument
+* Return: Returns a json object containing the success status, questions, total number of questions, current category and all categroies present in the api
+* Sample request: `curl  http://127.0.0.1:5000/questions`
+
+```json
+{
+  "categories": [
+    {
+      "id": 1, 
+      "type": "Science"
+    }, 
+    {
+      "id": 2, 
+      "type": "Art"
+    }, 
+    {
+      "id": 3, 
+      "type": "Geography"
+    }, 
+    {
+      "id": 4, 
+      "type": "History"
+    }, 
+    {
+      "id": 5, 
+      "type": "Entertainment"
+    }, 
+    {
+      "id": 6, 
+      "type": "Sports"
+    }
+  ], 
+  "current_category": null, 
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+    {
+      "answer": "Tom Cruise", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 4, 
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }, 
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }]
+}
+```
+
+<br>
+
+`DELETE /questions/${id}`
+* Endpoint to delete question specified by id.
+* Argumnets: Takes the id of the question to be deleted as id.
+* Return: Returns a json object containing the question, success status and id of deleted question.
+* Sample request: `curl -X DELETE http://127.0.0.1:5000/questions/${id}`
+
+
+
+
+<br>
+
+`POST /questions`
+* Endpoint to create a new question in the api
+* Arguments: Takes no arguments
+* Return: returns a json object containing the success status and id of question created.
+* Sample request: `curl -X POST http://127.0.0.1:5000/questions`
+
+<br>
+
+`POST /questions/search`
+* Endpoint to search for questions matching a specified search time.
+* Arguments: None
+* Return: returns a json object containing the success status, total number of questions containing search term, and questions containing search term.
+
+
+<br>
+
+`GET /categories/${id}/questions`
+* Endpoint to search for questions of a particular category specified by id.
+* Arguments: category id
+* Return: returns a json object containing the success status, total number of questions in that category, category being searched, and all questions present in that category.
+* Sample request: `curl -X GET http://127.0.0.1:5000/categories/${id}/questions`
+
+```json
+{
+  "category": "Art", 
+  "questions": [
+    {
+      "answer": "Escher", 
+      "category": 2, 
+      "difficulty": 1, 
+      "id": 16, 
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    }, 
+  ], 
+  "success": true, 
+  "total_questions": 1
+}
+
+```
+
+<br>
+
+`POST `
+
+## **Error Handling**
+errors in the api return a json object
+```json
+{
+  "success": False,
+  "message": "404: Page not Found"
+}
+
+```
+
 ## Testing
 
 Write at least one test for the success and at least one error behavior of each endpoint using the unittest library.
