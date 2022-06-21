@@ -60,7 +60,7 @@ def create_app(test_config=None):
         if len(formatted_categories) is not None:
             return jsonify({
                 "success": True,
-                "categories": formatted_categories[start:end],
+                "categories": {item.id: item for item in categories},
                 "total_categories": len(formatted_categories)
             })
 
@@ -95,7 +95,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 "success": True,
-                "questions": formatted_questions[start:end],
+                "questions": {item.id: item.type for item in categories},
                 "total_questions": len(questions),
                 "current_category": None,
                 "categories": formatted_categories[start:end]
