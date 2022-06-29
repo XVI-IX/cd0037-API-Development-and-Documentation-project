@@ -215,7 +215,7 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
-    @app.route("/quiz", methods=["POST"])
+    @app.route("/quizzez", methods=["POST"])
     def get_quiz():
         data = request.get_json()
 
@@ -267,10 +267,10 @@ def create_app(test_config=None):
         }), 422
 
     @app.errorhandler(500)
-    def bad_request(error):
+    def internal_erro(error):
         return jsonify({
             "success": False,
-            "message": "500: Bad Request"
+            "message": "500: Internal Server Error"
         }), 500
 
     return app
