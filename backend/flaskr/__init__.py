@@ -266,5 +266,12 @@ def create_app(test_config=None):
             "message": "422: Request could not be processed"
         }), 422
 
+    @app.errorhandler(500)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "message": "500: Bad Request"
+        }), 500
+
     return app
 
