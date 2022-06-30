@@ -109,17 +109,20 @@ def create_app(test_config=None):
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
 
-        question = Question.query.filter(Question.id==question_id)
+        question = Question.query.filter(Question.id == question_id).one_or_none()
         
-        question.delete()
-
-        return jsonify({
-
-            "question":None,
-            "success": True,
-            "deleted": question_id,
-
-        })
+        if question:
+            try:
+                question.delete()
+            except:
+                abort(500)
+            
+            return jsonify({
+                "success": True,
+                'question_id': question.id
+            })
+        else:
+            abort(422)
     """
     @DONE:
     Create an endpoint to POST a new question,
@@ -134,17 +137,21 @@ def create_app(test_config=None):
     def new_question():
         question_body = request.get_json()
 
-        if any(question_body) != "":
-            new_question = question_body.get("question")
-            new_answer = question_body.get("answer")
-            new_category = question_body.get("category")
-            new_difficult = question_body.get("difficulty")
+        new_question = question_body.get("question")
+        new_answer = question_body.get("answer")
+        new_category = question_body.get("category")
+        new_difficult = question_body.get("difficulty")
 
-            question = Question(
-                question=new_question, answer=new_answer,
-                category=new_category, difficulty=new_difficult)
-        else:
-            abort(422)
+        params = [new_question, new_answer, new_category, new_difficult]
+
+        for param in params:
+            if not param:
+                abort(422)
+
+        question = Question(
+            question=new_question, answer=new_answer,
+            category=new_category, difficulty=new_difficult)
+            
         try:
             question.insert()
         except Exception as e:
@@ -215,38 +222,73 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
-    @app.route("/quizzez", methods=["POST"])
+    # @app.route("/quizzes", methods=["POST"])
+    # def get_quiz():
+    #     data = request.get_json()
+
+    #     previous_questions = data.get("previous_questions")
+    #     category = data.get("quiz_category")
+
+    #     if (previous_questions is None) or (category is None):
+    #         abort(400)
+
+    #     if category["id"] == 0:
+    #         questions = Question.query.filter(
+    #             Question.id.notin_(previous_questions)
+    #         ).order_by(
+    #             Question.id
+    #         ).all()
+
+            
+    #     else:
+    #         questions = Question.query.filter_by(
+    #             category=category.get("id")
+    #             ).filter(
+    #                 Question.id.notin_(previous_questions)
+    #             ).all()
+
+    #     if not questions:
+    #         abort(404)
+
+    #     quiz = random.choice(questions).format()
+
+    #     return jsonify({
+    #         "success": True,
+    #         "question": quiz
+    #     })
+
+    @app.route("/quizzes", methods=["POST"])
     def get_quiz():
         data = request.get_json()
+        previous_question = data.get("previous_questions")
+        quiz_category = data.get("quiz_category")
 
-        previous_questions = data.get("previous_questions")
-        category = data.get("quiz_category")
-
-        if (previous_questions is None) or (category is None):
-            abort(400)
-
-        if category["id"] == 0:
-            questions = Question.query.filter(
-                Question.id.notin_(previous_questions)
-            ).order_by(
-                Question.id
-            ).all()
+        if quiz_category["id"] == 0:
+            questions = Question.query.all()
         else:
             questions = Question.query.filter_by(
-                category=category.get("id")
-                ).filter(
-                    Question.id.notin_(previous_questions)
+                category=quiz_category["id"]
                 ).all()
 
-        if not questions:
-            abort(404)
+            if not questions:
+                abort(404)
+        
+        quizzes = [
+            question.format() for question in questions if question.id not in previous_question
+        ]
 
-        quiz = random.choice(questions).format()
+        if not quizzes:
+            return jsonify({
+                "success": True,
+                # "question": None
+            }) 
+        else:
+            question = random.choice(quizzes)
 
-        return jsonify({
-            "success": True,
-            "question": quiz
-        })
+            return jsonify({
+                "success": True,
+                "question": question
+            })
     """
     @DONE:
     Create error handlers for all expected errors
@@ -262,8 +304,8 @@ def create_app(test_config=None):
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
-            "sucess": True,
-            "message": "422: Request could not be processed"
+            "success": False,
+            "message": "422: Request not Processed"
         }), 422
 
     @app.errorhandler(500)
